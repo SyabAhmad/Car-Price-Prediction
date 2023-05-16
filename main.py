@@ -71,9 +71,16 @@ prediction = regressor.predict(xTest)
 
 mse = mean_squared_error(yTest, prediction)
 
-predictionData = pd.DataFrame({"Actual Price: ": yTest, "Prediction: ": prediction})
+predictionData = pd.DataFrame({"Actual Price": yTest, "Prediction": prediction})
+mseValues = []
+for index, row in predictionData.iterrows():
+    mse = mean_squared_error([row["Actual Price"]], [row["Prediction"]])
+    mseValues.append(mse)
 
 
-print(predictionData)
+mse_value = mean_squared_error(yTest, prediction)
+predictionData["mse values"] = mseValues
 
+print(predictionData.head(5))
 print("Mean Squared Error: ", mse)
+print("Root Mean Squared Error: ", np.sqrt(mse))

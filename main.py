@@ -43,3 +43,37 @@ data["Engine volume"] = data["Engine volume"].str.replace(" Turbo", "").astype(f
 #print("completed")
 #print(data["Engine volume"])
 
+xData = data[['Manufacturer',
+              'Model',
+              'Prod. year',
+              'Category',
+              'Leather interior',
+              'Fuel type',
+              'Engine volume',
+              'Mileage',
+              'Cylinders',
+              'Gear box type',
+              'Drive wheels',
+              'Doors',
+              'Wheel',
+              'Color',
+              'Airbags']]
+
+yData = data['Price']
+
+regressor = LinearRegression()
+
+xTrain, xTest, yTrain, yTest = train_test_split(xData,yData, test_size=0.20, random_state=45)
+
+regressor.fit(xTrain, yTrain)
+
+prediction = regressor.predict(xTest)
+
+mse = mean_squared_error(yTest, prediction)
+
+predictionData = pd.DataFrame({"Actual Price: ": yTest, "Prediction: ": prediction})
+
+
+print(predictionData)
+
+print("Mean Squared Error: ", mse)

@@ -3,9 +3,11 @@ from sklearn.metrics import mean_squared_error
 print("Car Price Prediction")
 import pandas as pd
 import numpy as np
-from sklearn.model_selection import train_test_split
+from sklearn.model_selection import train_test_split, cross_val_score
 from sklearn.linear_model import LinearRegression
-from sklearn.preprocessing import LabelEncoder
+from sklearn.preprocessing import LabelEncoder, StandardScaler
+
+from sklearn.ensemble import RandomForestRegressor
 
 data = pd.read_csv("dataset/car_price_prediction.csv", delimiter=",")
 
@@ -61,6 +63,24 @@ xData = data[['Manufacturer',
 
 yData = data['Price']
 
+### before scaling to check if it maters or not
+print("mean: ", xData.mean())
+print("std: ", xData.std())
+print("max: ", xData.max())
+print("min: ", xData.min())
+
+scaler = StandardScaler()
+xData = scaler.fit_transform(xData)
+
+### after scaling if scalling matters or not for this dataset
+print("\n\nAfter Scalling\n\n")
+print("mean: ", xData.mean())
+print("std: ", xData.std())
+print("max: ", xData.max())
+print("min: ", xData.min())
+
+### so it matters to do scaling of your data it is not performing will
+
 regressor = LinearRegression()
 
 xTrain, xTest, yTrain, yTest = train_test_split(xData,yData, test_size=0.20, random_state=45)
@@ -84,3 +104,34 @@ predictionData["mse values"] = mseValues
 print(predictionData.head(5))
 print("Mean Squared Error: ", mse)
 print("Root Mean Squared Error: ", np.sqrt(mse))
+
+
+### Tried on Random Forest Regressor but does not work here
+
+forestRegressor = RandomForestRegressor()
+forestRegressor.fit(xTrain, yTrain)
+
+forestPrediction = forestRegressor.predict(xTest)
+
+forestmse = mean_squared_error(yTest, forestPrediction)
+
+print("Mean Squared Error: ",forestmse)
+
+### performing the cross validation check
+
+regressor2 = RandomForestRegressor()
+cv_scores = cross_val_score(regressor2, xData, yData, cv=5, scoring="neg_mean_squared_error")
+
+mse_scores = -cv_scores
+
+mean_mse = mse_scores.mean()
+std_mse = mse_scores.std()
+
+print("Mean Squared Error (CV):", mean_mse)
+print("Standard Deviation of MSE (CV):", std_mse)
+###
+## Mean Squared Error (CV): 54159637336.86895
+## Standard Deviation of MSE (CV): 65736598933.15319
+### its very high so we have to refine our model
+
+
